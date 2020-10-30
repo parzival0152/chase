@@ -3,6 +3,9 @@ from time import sleep
 import random
 from threading import Thread
 
+def chunkdiv(l,n):
+    return [l[i:i+n] for i in range(0,len(l),n)]
+
 def handle_player(player,id):
     #thread that will handle the games for each player
     print(f'player {id} has connected')
@@ -25,6 +28,10 @@ server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 server.bind(('127.0.0.1',65353))
 
 players = {} #dictionary to hold the players
+questions = []
+
+with open('questions.txt','r',encoding='utf8') as f:
+    questions = list(map(str.strip,f.readlines()))
 
 if __name__ == "__main__":
     #main
