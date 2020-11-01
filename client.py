@@ -17,6 +17,9 @@ def comm_control(comm,msg):
     elif comm is 'q':
         global Quit
         Quit = True
+    
+    elif comm is 'w':
+        os.system('cls')
 
     elif comm is 'n':
         answer = ''
@@ -28,10 +31,7 @@ def comm_control(comm,msg):
                 return
         sendto(answer)
 
-    elif comm is 'w':
-        os.system('cls')
-
-    elif comm[0] is 'c':
+    elif comm is 'c':
         comm = comm[1:]
         options = comm[comm.index('(')+1:comm.index(')')].split(',')
         answer = ''
@@ -43,8 +43,21 @@ def comm_control(comm,msg):
                 return
         sendto(answer)
 
+def begining():
+    global Quit
+    answer = ''
+    while answer not in ('yes', 'y' , 'no' , 'n'):
+        answer = input("Do you want to enter the chase (y/n)? ")
+
+    if answer in ('no', 'n'):
+        Quit = True
+        player.close()
+
+    elif answer in ('yes','y'): 
+        player.connect(('127.0.0.1',42069))
+
 player = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-player.connect((socket.gethostname(),42069))
+begining()
 
 while not Quit:
     recive()
