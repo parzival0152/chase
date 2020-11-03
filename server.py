@@ -38,6 +38,26 @@ class Game:
         self.printplayer(f'You are on stage: {self.playerpos}')
         self.printplayer(f'Lifelines remaining: {self.lifeline}')
         sleep(0.05)
+    
+    def player_question(self):
+        questionIndex = random.choice(self.qlist)
+        self.qlist.remove(questionIndex)
+        prompt, *options = questions[questionIndex]
+        mix = [0,1,2,3]
+        random.shuffle(mix)
+        correct = options[0]
+        options[mix[0]],options[mix[1]],options[mix[2]],options[mix[3]] = options
+        msg = f'{prompt}#'+'#'.join(options)
+        self.sendto('n@'+msg)
+        answer = self.player.recv(1024).decode('utf8')
+        while answer is '!lifeline':
+            if self.lifeline == 0:
+                self.printplayer('Looks like you have no more lifelines left\nLets try that question again')
+                self.sendto('n@'+msg)
+                answer = self.player.recv(1024).decode('utf8')
+            else:
+                pass
+        return int(answer.strip()) == correct
 
 
 def chunkdiv(l,n):
@@ -61,9 +81,6 @@ def accept_conn():
             players[client] = client_address # store to keep track
             Thread(target=handle_player, args=(client,i,)).start()
             # start another thread to deal with player
-
-
-
 
 
 if __name__ == "__main__":
