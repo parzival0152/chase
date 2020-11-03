@@ -7,7 +7,7 @@ def sendto(msg = '\n'):
 
 def recive():
     strm = player.recv(1024).decode("utf8")
-    [comm , msg] = strm.split('@')
+    comm , msg = strm.split('@')
     comm_control(comm,msg)
 
 def comm_control(comm,msg):
@@ -21,23 +21,19 @@ def comm_control(comm,msg):
     elif comm is 'w':
         os.system('cls')
 
+    elif comm is 'b':
+        begining()
+
     elif comm is 'n':
         answer = ''
         while not answer.isnumeric():
-            answer = input(f'{msg}: ')
-            if answer == '!status' or answer == '!quit':
-                sendto(answer)
-                recive()
-                return
-        sendto(answer)
-
-    elif comm is 'c':
-        comm = comm[1:]
-        options = comm[comm.index('(')+1:comm.index(')')].split(',')
-        answer = ''
-        while answer not in options:
-            answer = input(f"{msg} ({','.join(options)}): ")
-            if answer == '!status' or answer == '!quit':
+            os.system('cls')
+            prompt, *options = msg.split('#')
+            print(f"Your quetsion is:\n{prompt}")
+            for i,option in enumerate(options):
+                print(f"{i+1}) {option}.")
+            answer = input("And your answer is (1-4)? ")
+            if answer == '!lifeline':
                 sendto(answer)
                 recive()
                 return
@@ -53,8 +49,11 @@ def begining():
         Quit = True
         player.close()
 
-    elif answer in ('yes','y'): 
-        player.connect(('127.0.0.1',42069))
+    elif answer in ('yes','y'):
+        try:
+            player.connect(('127.0.0.1',65353))
+        except:
+            pass #itll fail if the socket is connected
 
 player = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 begining()
