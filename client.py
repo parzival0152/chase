@@ -26,13 +26,13 @@ def comm_control(comm,msg):
 
     elif comm is 'n':
         answer = ''
-        while not answer.isnumeric():
-            os.system('cls')
+        while answer not in ('1','2','3','4'):
             prompt, *options = msg.split('#')
             print(f"Your quetsion is:\n{prompt}")
             for i,option in enumerate(options):
                 print(f"{i+1}) {option}.")
             answer = input("And your answer is (1-4)? ")
+            os.system('cls')
             if answer == '!lifeline':
                 sendto(answer)
                 recive()

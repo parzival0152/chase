@@ -20,7 +20,11 @@ class Game:
         self.lifeline = 1
 
     def run(self):
-        pass
+        while len(self.qlist) != 0:
+            state = self.player_question()
+            self.cleanscreen()
+            self.printplayer(state)
+            sleep(3)
 
     def sendto(self,msg = '\n'):
         self.player.send(bytes(str(msg),"utf8"))
@@ -41,7 +45,6 @@ class Game:
     
     def player_question(self):
         questionIndex = random.choice(self.qlist)
-        self.qlist.remove(questionIndex)
         prompt, *options = questions[questionIndex]
         mix = [0,1,2,3]
         random.shuffle(mix)
@@ -50,14 +53,22 @@ class Game:
         msg = f'{prompt}#'+'#'.join(options)
         self.sendto('n@'+msg)
         answer = self.player.recv(1024).decode('utf8')
-        while answer is '!lifeline':
+        while answer == '!lifeline':
             if self.lifeline == 0:
                 self.printplayer('Looks like you have no more lifelines left\nLets try that question again')
                 self.sendto('n@'+msg)
                 answer = self.player.recv(1024).decode('utf8')
             else:
-                pass
-        return int(answer.strip()) == correct
+                self.lifeline -= 1
+                prompt, *options,_,_ = questions[questionIndex]
+                mix = [0,1]
+                random.shuffle(mix)
+                options[mix[0]],options[mix[1]] = options
+                msg = f'{prompt}#'+'#'.join(options)
+                self.sendto('n@'+msg)
+                answer = self.player.recv(1024).decode('utf8')
+        self.qlist.remove(questionIndex)
+        return options[int(answer.strip())-1] == correct
 
 
 def chunkdiv(l,n):
