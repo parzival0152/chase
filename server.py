@@ -3,6 +3,12 @@ from time import sleep
 import random
 from threading import Thread
 
+starting_funds = (
+    0,
+    5000,
+    10000,
+    15000
+)
 players = {} #dictionary to hold the players
 questions = []
 # setting up the socket
@@ -20,11 +26,38 @@ class Game:
         self.lifeline = 1
 
     def run(self):
-        while len(self.qlist) != 0:
-            state = self.player_question()
-            self.cleanscreen()
-            self.printplayer(state)
-            sleep(3)
+        #start phase
+        self.cleanscreen()
+        self.printplayer("Welcome to \"The Chase\"")
+        self.printplayer("To start the game press Enter")
+        self.waitrespond()
+        self.cleanscreen()
+        self.lifeline = 0
+        rights = 0
+        for _ in range(3):
+            self.printplayer("These 3 questions will decide the amount of money you start with")
+            rights += self.player_question()
+        self.balance = starting_funds[rights]
+        self.printplayer(rights)
+        #self.printplayer(f"{self.balance}$")
+        while not rights:
+            self.printplayer("Looks like you are dumb")
+            self.begining()
+            self.run()
+
+        #setup phase
+        self.cleanscreen()
+
+        #chase pahse
+
+        #end phase
+
+    def begining(self):
+        self.sendto('b@')
+
+    def waitrespond(self):
+        self.sendto('e@')
+        self.player.recv(1024).decode('utf8')
 
     def sendto(self,msg = '\n'):
         self.player.send(bytes(str(msg),"utf8"))
@@ -79,19 +112,26 @@ def handle_player(player,id):
     print(f'player {id} has connected')
     game = Game(player)
     game.run()
-         
+
+def reject_player(player):
+    player.send(bytes(str("p@There are 3 players connected already\n"),"utf8"))
+    player.send(bytes(str("q"),"utf8"))
+
 def accept_conn():
     #accept thread
     i = 0 #connection counter, used while debugging
     while True:
         # keep the server reading sonnections
-        while len(players)<3:
-            # connect players if less then 2 players are connected
+        if len(players)<3:
+            # connect players if less then 3 players are connected
             client, client_address = server.accept() # accept incoming cennction
             i+=1
             players[client] = client_address # store to keep track
             Thread(target=handle_player, args=(client,i,)).start()
             # start another thread to deal with player
+        else:
+            client, client_address = server.accept()
+            Thread(target=reject_player, args=(client,)).start()
 
 
 if __name__ == "__main__":

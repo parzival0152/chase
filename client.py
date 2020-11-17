@@ -23,6 +23,10 @@ def comm_control(comm,msg):
 
     elif comm is 'b':
         begining()
+    
+    elif comm is 'e':
+        input()
+        sendto()
 
     elif comm is 'n':
         answer = ''
@@ -50,12 +54,10 @@ def begining():
         player.close()
 
     elif answer in ('yes','y'):
-        try:
-            player.connect(('127.0.0.1',65353))
-        except:
-            pass #itll fail if the socket is connected
+        pass
 
 player = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+player.connect(('127.0.0.1',65353))
 begining()
 
 while not Quit:
