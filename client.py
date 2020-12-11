@@ -15,6 +15,7 @@ def comm_control(comm,msg):
         print(msg)
 
     elif comm is 'q':
+        print("quitting")
         global Quit
         Quit = True
     
@@ -22,48 +23,39 @@ def comm_control(comm,msg):
         os.system('cls')
 
     elif comm is 'b':
-        begining()
+        answer = ''
+        while answer not in ('yes', 'y' , 'no' , 'n'):
+            answer = input("Do you want to enter the chase (y/n)? ")
+        sendto(answer[0])
     
     elif comm is 'e':
         input()
         sendto()
 
     elif comm is 'n':
-        answer = ''
-        while answer not in ('1','2','3','4'):
-            prompt, *options = msg.split('#')
-            print(f"Your quetsion is:\n{prompt}")
+        answer = '-1'
+        prompt, *options = msg.split('#')
+        while int(answer) not in range(1,len(options)+1):
+            print(f"{prompt}")
             for i,option in enumerate(options):
                 print(f"{i+1}) {option}.")
-            answer = input("And your answer is (1-4)? ")
+            answer = input(f"And your answer is (1-{len(options)})? ")
             os.system('cls')
             if answer == '!lifeline':
                 sendto(answer)
                 recive()
                 return
         sendto(answer)
-
-def begining():
-    global Quit
-    answer = ''
-    while answer not in ('yes', 'y' , 'no' , 'n'):
-        answer = input("Do you want to enter the chase (y/n)? ")
-
-    if answer in ('no', 'n'):
-        Quit = True
-        player.close()
-
-    elif answer in ('yes','y'):
-        pass
+   
 
 player = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 player.connect(('127.0.0.1',65353))
-begining()
 
 while not Quit:
     recive()
 
 print('logging off')
+player.close()
 
 while True:
     pass
