@@ -145,7 +145,6 @@ class Game:
         self.qlist.remove(questionIndex)
         return options[int(answer.strip())-1] == correct
 
-
 def chunkdiv(l,n):
     return [l[i:i+n] for i in range(0,len(l),n)]
 
@@ -156,7 +155,8 @@ def handle_player(player,id):
     game.run()
 
 def reject_player(player):
-    player.send(bytes(str("p@There are 3 players connected already\n"),"utf8"))
+    global MAXPLAYERS
+    player.send(bytes(str(f"p@There are {MAXPLAYERS} players connected already\n"),"utf8"))
     player.send(bytes(str("q@"),"utf8"))
 
 def accept_conn():
