@@ -1,3 +1,8 @@
+##########################################
+#   code made by:                        #
+#               Ilay Tzuberi - 211873286 #
+#               Omri Baron   - 314838210 #
+##########################################
 import socket,os
 from threading import Thread
 
