@@ -63,7 +63,7 @@ class Game:
             self.cleanscreen()
             msg = f"n@Where would you like to start?#In position 3 with {self.balance}$#In position 2 with {self.balance * 2}$#In position 4 with {self.balance // 2}$"
             self.sendto(msg) #ask the player where would they like to start
-            answer = self.player.recv(1024).decode('utf8') #get their answer
+            answer = self.recvfrom() #get their answer
             if answer == '1':
                 self.playerpos = 3
             elif answer == '2':
@@ -101,7 +101,7 @@ class Game:
         self.chaserpos = 0
         #reset all positions
         self.sendto('b@') #send begin instruct command
-        answer = self.player.recv(1024).decode('utf8')
+        answer = self.recvfrom()
         if answer=='n': #if player dosent want to play
             self.sendto('q@') #instruct player to quit
             self.player.close() #close connection
@@ -112,11 +112,21 @@ class Game:
         #this command does nothing but wait for the client to press enter
         #it simply ignores all other input
         self.sendto('e@') #send 'e' instruction
-        self.player.recv(1024).decode('utf8') #wait to hear back
+        self.recvfrom() #wait to hear back
 
     def sendto(self,msg = '\n'):
         self.player.send(bytes(str(msg),"utf8")) #encode message and send it to the player
         sleep(0.05)
+
+    def recvfrom(self):
+        temp = '' #make a temp variable
+        try:
+            temp = self.player.recv(1024).decode('utf8') #try to recive from player
+            return temp
+        except: #if fails this means that our player disconnected mid game
+            self.player.close() #close connection
+            players.pop(self.player) #remove from memory to free room for more players
+            sys.exit() #terminate thread      
 
     def cleanscreen(self):
         self.sendto('w@') # send clear screen instruction
@@ -141,12 +151,12 @@ class Game:
         options[mix[0]],options[mix[1]],options[mix[2]],options[mix[3]] = options # assaign the options random locations in the list based on the mix
         msg = f'Your quetsion is:\n{prompt}#'+'#'.join(options) #combine the prompt and the options, seperated by '#' to aid in client side seperation
         self.sendto('n@'+msg) #send question command and msg to player
-        answer = self.player.recv(1024).decode('utf8') # get answer
+        answer = self.recvfrom() # get answer
         while answer == '!lifeline': #if the player requsted a lifeline
             if self.lifeline == 0: # if player has no lifeline
                 self.printplayer('Looks like you have no more lifelines left\nLets try that question again') #tell him that his shit out of luck
                 self.sendto('n@'+msg) #ask the question again
-                answer = self.player.recv(1024).decode('utf8')#wait for answer
+                answer = self.recvfrom()#wait for answer
             else: #in the case that he do have a lifeline
                 self.lifeline -= 1 #reduce it by one (incase we want to add even more lifelines in the future)
                 prompt, *options,_,_ = questions[questionIndex] #get the prompt and options again
@@ -156,7 +166,7 @@ class Game:
                 options[mix[0]],options[mix[1]] = options #same process of mix and assaign as before
                 msg = f'{prompt}#'+'#'.join(options) #create new message
                 self.sendto('n@'+msg) #ask the new message
-                answer = self.player.recv(1024).decode('utf8') #await answer once more
+                answer = self.recvfrom() #await answer once more
         self.qlist.remove(questionIndex) #remove question index from the list of possible indecies
         return options[int(answer.strip())-1] == correct #check if the option the player chose is the same as the coeerct one
         #keeping hold of the correct answers index was proving too hard
