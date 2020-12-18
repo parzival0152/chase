@@ -33,6 +33,7 @@ def comm_control(comm,msg):
         answer = ''
         while answer not in ('yes', 'y' , 'no' , 'n'):
             answer = input("Do you want to enter the chase (y/n)? ")
+            os.system('cls')
         sendto(answer[0])
     
     elif comm is 'e': #wait for input and send back

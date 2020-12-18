@@ -16,9 +16,9 @@ starting_funds = (
 ) # touple to hold our starting funds
 players = {} #dictionary to hold the players
 questions = [] #list to store our questions
-# setting up the socket
-MAXPLAYERS = 3
+MAXPLAYERS = 3 #global variables
 ENDGOAL = 7
+# setting up the socket
 server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 server.bind(('127.0.0.1',65353))
 
@@ -210,10 +210,9 @@ if __name__ == "__main__":
     #main
     with open('questions.txt','r',encoding='utf8') as f: #open questions file
         questions = chunkdiv(list(map(str.strip,f.readlines())),5) #devide lines from files into 5 line chunks
-    server.listen(5)
+    server.listen(5) #listen to 5 connections
     print("waiting for connection")
     print(server.getsockname())
-    #listen to 5 connections
     ACCEPT_THREAD = Thread(target=accept_conn)
     ACCEPT_THREAD.start() #initiate a thread to handle the connection of players
     ACCEPT_THREAD.join() #join thread so main will not imidiatly die
