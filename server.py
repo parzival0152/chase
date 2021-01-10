@@ -145,10 +145,8 @@ class Game:
     def player_question(self):
         questionIndex = random.choice(self.qlist) # get a random question index
         prompt, *options = questions[questionIndex] #get prompt and 
-        mix = [0,1,2,3] # create a list of indexes
-        random.shuffle(mix) #shuffle them around
         correct = options[0] # the fisrt options is always correct
-        options[mix[0]],options[mix[1]],options[mix[2]],options[mix[3]] = options # assaign the options random locations in the list based on the mix
+        random.shuffle(options) # suffle the options
         msg = f'Your quetsion is:\n{prompt}#'+'#'.join(options) #combine the prompt and the options, seperated by '#' to aid in client side seperation
         self.sendto('n@'+msg) #send question command and msg to player
         answer = self.recvfrom() # get answer
@@ -161,9 +159,7 @@ class Game:
                 self.lifeline -= 1 #reduce it by one (incase we want to add even more lifelines in the future)
                 prompt, *options,_,_ = questions[questionIndex] #get the prompt and options again
                                                                 #only this time we ignore 2 options at the back
-                mix = [0,1] #this time we mix with 2 places
-                random.shuffle(mix)
-                options[mix[0]],options[mix[1]] = options #same process of mix and assaign as before
+                random.shuffle(options) #shuffle the smaller options
                 msg = f'{prompt}#'+'#'.join(options) #create new message
                 self.sendto('n@'+msg) #ask the new message
                 answer = self.recvfrom() #await answer once more
